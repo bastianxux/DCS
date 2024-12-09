@@ -9,7 +9,7 @@ import org.apache.kafka.streams.Topology;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
-public class MyStreamDemo {
+public class MyKafkaStreaming {
     public static void main(String[] args) {
         // 创建Properties对象，配置Kafka Streaming配置项
         Properties prop = new Properties();
