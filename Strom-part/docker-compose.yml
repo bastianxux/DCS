@@ -1,0 +1,52 @@
+version: '3'
+services:
+  zookeeper:
+    image: zookeeper
+    container_name: ice-zookeeper
+    networks:
+      - docker-spark_spark-net
+
+  nimbus:
+    image: storm
+    container_name: ice-nimbus
+    networks:
+      - docker-spark_spark-net
+    ports:
+      - "6627:6627"
+      - "8085:8080"
+    environment:
+      STORM_ZOOKEEPER_SERVERS: "zookeeper"
+
+    command: ["storm","nimbus"]
+
+  supervisor1:
+    image: storm
+    container_name: supervisor1
+    networks:
+      - docker-spark_spark-net
+    depends_on:
+      - nimbus
+    environment:
+      STORM_ZOOKEEPER_SERVERS: "zookeeper"
+      SUPERVISOR_SLOTS_PORTS: "[6700, 6701, 6702, 6703]"
+    ports:
+      - "6700-6703:6700-6703"  # 暴露 supervisor1 的 worker 端口到主机
+    command: ["storm","supervisor"]
+ 
+  supervisor2:
+    image: storm
+    container_name: supervisor2
+    networks:
+      - docker-spark_spark-net
+    depends_on:
+      - nimbus
+    environment:
+      STORM_ZOOKEEPER_SERVERS: "zookeeper"
+      SUPERVISOR_SLOTS_PORTS: "[6800, 6801, 6802, 6803]"
+    ports:
+      - "6800-6803:6800-6803"  # 暴露 supervisor2 的 worker 端口到主机
+    command: ["storm","supervisor"]
+
+networks:
+  docker-spark_spark-net:
+    external: true
